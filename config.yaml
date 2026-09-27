@@ -1,49 +1,63 @@
-# Paper first. Live stays off until you change this AND add keys.
+# Paper first. Live stays locked until mode: live AND the live.confirm phrase
+# AND API keys in env vars (COINSPOT_API_KEY / COINSPOT_API_SECRET).
 mode: paper          # paper | live
 poll_seconds: 60
 
-starting_aud: 10000.00
-fee_rate: 0.001      # extra 0.1% on top of bid/ask spread
-
-# Live only — leave blank in paper mode. Never commit real keys.
-coinspot:
-  api_key: ""
-  api_secret: ""
-  use_agentic_limits: true
+starting_aud: 50.00
+# CoinSpot "buy now / sell now" (what the API uses) charges ~1% per side.
+# Keep this conservative so paper results are not better than real ones.
+fee_rate: 0.01
 
 universe:
   - BTC
   - ETH
 
-# Always-on drip. Set amount to 0 to disable a coin.
+# Steady drip so the bot is always building a position. 0 disables a coin.
+# $4/day total -> about 11 days to deploy $50 if nothing else fires.
 dca:
   enabled: true
   every_hours: 24
   amounts_aud:
-    BTC: 50
-    ETH: 30
+    BTC: 2.50
+    ETH: 1.50
 
-# Extra buy if last price is this far below the rolling high.
+# Extra buy when price falls this far below its recent high.
 dip:
   enabled: true
-  drop_pct: 5.0
-  lookback_hours: 72
+  drop_pct: 3.0
+  lookback_hours: 24
   buy_aud:
-    BTC: 40
-    ETH: 25
-  cooldown_hours: 12
+    BTC: 5
+    ETH: 4
+  cooldown_hours: 6
 
-# Sell a slice when unrealised gain from average cost hits target.
+# Lock in gains: sell a slice when bid is this far above average cost.
+# Must clear ~2% round-trip fees + spread to actually make money.
 take_profit:
   enabled: true
-  gain_pct: 12.0
-  sell_fraction: 0.25
-  cooldown_hours: 24
+  gain_pct: 6.0
+  sell_fraction: 0.5
+  cooldown_hours: 6
+
+# Cut losers: sell when bid is this far below average cost, then pause buys.
+stop_loss:
+  enabled: true
+  loss_pct: 10.0
+  sell_fraction: 1.0
+  pause_buys_hours: 24
 
 risk:
-  max_trade_aud: 200
-  max_daily_spend_aud: 250
-  min_aud_reserve: 500
-  max_position_pct:        # of total equity
+  min_trade_aud: 1.00          # CoinSpot rejects tiny orders
+  max_trade_aud: 10
+  max_daily_spend_aud: 12
+  min_aud_reserve: 5           # never spend the last $5
+  max_position_pct:            # of total bot equity
     BTC: 0.70
-    ETH: 0.40
+    ETH: 0.50
+
+# Live-only locks. Keys never go in this file — use env vars.
+live:
+  # Must be exactly: I understand this trades real money
+  confirm: ""
+  # Hard ceiling on total AUD the bot may ever spend buying in live mode.
+  max_lifetime_spend_aud: 50

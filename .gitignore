@@ -1,7 +1,10 @@
 state.json
 trades.csv
+state_live.json
+trades_live.csv
 *.tmp
 __pycache__/
+.pytest_cache/
 .venv/
 venv/
 .env
