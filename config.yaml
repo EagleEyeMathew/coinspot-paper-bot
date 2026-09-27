@@ -1,0 +1,49 @@
+# Paper first. Live stays off until you change this AND add keys.
+mode: paper          # paper | live
+poll_seconds: 60
+
+starting_aud: 10000.00
+fee_rate: 0.001      # extra 0.1% on top of bid/ask spread
+
+# Live only — leave blank in paper mode. Never commit real keys.
+coinspot:
+  api_key: ""
+  api_secret: ""
+  use_agentic_limits: true
+
+universe:
+  - BTC
+  - ETH
+
+# Always-on drip. Set amount to 0 to disable a coin.
+dca:
+  enabled: true
+  every_hours: 24
+  amounts_aud:
+    BTC: 50
+    ETH: 30
+
+# Extra buy if last price is this far below the rolling high.
+dip:
+  enabled: true
+  drop_pct: 5.0
+  lookback_hours: 72
+  buy_aud:
+    BTC: 40
+    ETH: 25
+  cooldown_hours: 12
+
+# Sell a slice when unrealised gain from average cost hits target.
+take_profit:
+  enabled: true
+  gain_pct: 12.0
+  sell_fraction: 0.25
+  cooldown_hours: 24
+
+risk:
+  max_trade_aud: 200
+  max_daily_spend_aud: 250
+  min_aud_reserve: 500
+  max_position_pct:        # of total equity
+    BTC: 0.70
+    ETH: 0.40
